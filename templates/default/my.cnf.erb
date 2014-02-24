@@ -1,0 +1,116 @@
+# The following options will be passed to all MySQL clients
+[client]
+#password	= your_password
+port		= 3306
+socket		= /var/lib/mysql/mysql.sock
+
+# Here follows entries for some specific programs
+default-character-set = utf8
+
+#=========================================================================================
+#=========================================================================================
+# The MySQL server
+[mysqld]
+port		= 3306
+socket		= /var/lib/mysql/mysql.sock
+skip-locking
+
+# メモリ調整
+key_buffer_size = 30720K
+innodb_buffer_pool_size = 71680K
+innodb_additional_mem_pool_size = 1M
+innodb_log_buffer_size = 1M
+query_cache_size = 16M
+
+# メモリ調整（スレッド）
+myisam_sort_buffer_size = 1M
+sort_buffer_size = 2M
+read_rnd_buffer_size = 256K
+join_buffer_size = 256K
+read_buffer_size = 128K
+max_allowed_packet = 1M
+
+# メモリ調整（その他）
+innodb_log_file_size = 35840K
+innodb_log_files_in_group = 2
+thread_cache_size = 8
+table_open_cache = 128
+
+# Try number of CPU's*2 for thread_concurrency
+thread_concurrency = 2
+
+# Replication Master Server (default)
+# binary logging is required for replication
+log-bin=mysql-bin
+
+# binary logging format - mixed recommended
+binlog_format=mixed
+
+# required unique id between 1 and 2^32 - 1
+# defaults to 1 if master-host is not set
+# but will not function as a master if omitted
+server-id	= 1
+
+default-character-set = utf8
+skip-character-set-client-handshake
+character-set-server = utf8
+collation-server = utf8_general_ci
+init-connect = SET NAMES utf8
+
+# group_concatの最大文字数を設定する
+group_concat_max_len=200000
+
+#バイナリログの削除
+expire_logs_days=10
+
+
+#スローログ
+log-slow-queries=/var/lib/mysql/slow_query.log
+#秒指定
+long-query-time=2
+#Indexを指定していないクエリが実行された際にログ出力する
+#log-queries-not-using-indexes
+#管理用コマンドの実行もスロー監視する
+#log-slow-admin-statements
+
+# mymemcheck時に追加
+net_buffer_length=16384
+max_connections=20
+
+# ログバッファへの書き込みタイミング
+# 0=毎秒
+# 1=コミット時（デフォルト）
+# 2=コミット時、フラッシュは毎秒
+innodb_flush_log_at_trx_commit = 1
+
+#log-err=/path/to/log
+
+#=========================================================================================
+#=========================================================================================
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+default-character-set = utf8
+
+#=========================================================================================
+#=========================================================================================
+[mysql]
+no-auto-rehash
+# Remove the next comment character if you are not familiar with SQL
+#safe-updates
+
+default-character-set = utf8
+
+#=========================================================================================
+#=========================================================================================
+[myisamchk]
+key_buffer_size = 20M
+sort_buffer_size = 20M
+read_buffer = 2M
+write_buffer = 2M
+
+#=========================================================================================
+#=========================================================================================
+[mysqlhotcopy]
+interactive-timeout
