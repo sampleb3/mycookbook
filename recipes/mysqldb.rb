@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: mysqldb
-# Recipe:: default
+# Cookbook Name:: mycookbook
+# Recipe:: mysqldb
 #
 # Copyright 2014, YOUR_COMPANY_NAME
 #
