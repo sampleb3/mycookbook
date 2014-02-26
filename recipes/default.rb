@@ -73,7 +73,7 @@ cpan_client 'Net::SSLeay' do
     group 'root'
 end
 
-template "miniserv.conf" do
+template "/etc/webmin/miniserv.conf" do
   source "miniserv.conf.erb"
   owner "root"
   group "root"
@@ -83,29 +83,54 @@ end
 
 # -----------------------------------------------------------------
 # 公開鍵認証
-group node['osbase']['user'] do
-  group_name node['osbase']['group']
+group node['settings']['user'] do
+  group_name node['settings']['group']
   action     [:create]
 end
 
-user node['osbase']['user'] do
+user node['settings']['user'] do
   shell    '/bin/bash'
-  password node['osbase']['user_password']
-  group    node['osbase']['group']
+  password node['settings']['user_password']
+  group    node['settings']['group']
   supports :manage_home => true, :non_unique => false
   action   [:create]
 end
 
-directory "/home/#{node['osbase']['user']}/.ssh" do
-  owner node['osbase']['user']
-  group node['osbase']['group']
+directory "/home/#{node['settings']['user']}/.ssh" do
+  owner node['settings']['user']
+  group node['settings']['group']
   mode  0700
 end
 
 file "authorized_keys" do
-  path "/home/#{node['osbase']['user']}/.ssh/authorized_keys"
-  content node['osbase']['ssh_key']
-  owner node['osbase']['user']
+  path "/home/#{node['settings']['user']}/.ssh/authorized_keys"
+  content node['settings']['ssh_key']
+  owner node['settings']['user']
   mode  0600
+end
+
+# ssh設定
+service "sshd" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
+end
+
+template "/etc/ssh/sshd_config" do
+  source "sshd_config.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  notifies :restart, resources(:service => "sshd")
+end
+
+# sudo
+template "/etc/sudoers" do
+  source "sudoers.erb"
+  mode 0440
+  owner "root"
+  group "root"
+  variables({
+     :sudoers_users => node[:settings][:sudo_users]
+  })
 end
 
